@@ -6,8 +6,10 @@ package com.typesafe.training.scalatrain
 
 import java.lang.{IllegalArgumentException => IAE}
 
-import com.typesafe.training.scalatrain.scalatrain.TimeOrdering
+import com.typesafe.training.scalatrain.scalatrain.{Aaa, AaaOrdering, StringImprovements, TimeOrdering}
 import org.scalatest.{Matchers, WordSpec}
+
+import scala.collection.immutable.TreeSet
 
 class TimeSpec extends WordSpec with Matchers {
 
@@ -92,6 +94,19 @@ class TimeSpec extends WordSpec with Matchers {
 
     "return false" in {
       scalatrain.isIncSL(List(Time(3, 5), Time(3, 5), Time(3, 6), Time(3, 6), Time(3, 5))) shouldBe false
+    }
+  }
+
+  "TreeSet" should {
+    "accept Aaa" in {
+      val s = TreeSet(Aaa(200), Aaa(100))
+      s.toList shouldEqual List(Aaa(100), Aaa(200))
+    }
+  }
+
+  "String" should {
+    "have inc method" in {
+      "ABC".inc(4) shouldEqual "EFG"
     }
   }
 }

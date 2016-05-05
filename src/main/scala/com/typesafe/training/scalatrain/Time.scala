@@ -8,6 +8,18 @@ import scala.annotation.tailrec
 
 package object scalatrain {
 
+  implicit class StringImprovements(s: String) {
+    def inc(a: Char): String = {
+      s.map(c => (c + a).toChar)
+    }
+  }
+
+  case class Aaa(val v: Int)
+
+  implicit object AaaOrdering extends Ordering[Aaa] {
+    override def compare(o1: Aaa, o2: Aaa): Int = o1.v - o2.v
+  }
+
   implicit object TimeOrdering extends Ordering[Time] {
     override def compare(x: Time, y: Time): Int = x - y
   }

@@ -56,6 +56,17 @@ class World {
   // List[(Long with Double with Int) => Int]
   val fLi = List(f1, f2, f3)
 
+  // For optimization reason Int does not extend Long
+  // So, Lower Bound result of Int :: List[Long] in Covar List is List[Anyval]
+  val liInt = List[Int](1,2,3)
+  val liLong = List[Long](1L,2L,3L)
+
+  // result is List[List[Anyval]]
+  val liCol = List(liInt, liLong)
+
+  // result is List[Anyval] for both:
+  val liLo = 1 :: liLong
+  val liIn = 1L :: liInt
 }
 
 class Animal[-A <: Food] {
