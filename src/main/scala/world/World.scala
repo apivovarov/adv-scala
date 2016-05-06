@@ -9,11 +9,11 @@ class World {
   val fish3 = new Fish()
   val fish4 = new Fish()
 
-  val cow1 = new Cow()
-  val cow2 = new Cow()
-  val cow3 = new Cow()
+  val cow1 = new Cow[Grass]()
+  val cow2 = new Cow[Grass]()
+  val cow3 = new Cow[Grass]()
 
-  val fcow1 = new FineCow()
+  val fineCow1 = new Cow[FineGrass]
 
   val bird1 = new Bird()
   val bird2 = new Bird()
@@ -23,6 +23,9 @@ class World {
   val grass2 = new Grass()
   val grass3 = new Grass()
 
+  val fineGrass1 = new FineGrass()
+  val fineGrass2 = new FineGrass()
+
   val grain1 = new Grain()
   val grain2 = new Grain()
   val grain3 = new Grain()
@@ -30,22 +33,17 @@ class World {
   fish1.eat(fish2).eat(fish3)
 
   cow1.eat(grass1)
-  fcow1.eat(new FineGrass).eat(new FineGrass)
+  fineCow1.eat(new FineGrass).eat(new FineGrass)
 
   bird1.eat(grain1).eat(grain2)
-
-  val animal1 = new Animal[Grain]
-
-  animal1.eat(grain1)
 
   // List[Animal[Grass with CanSwim with Grain]]
   val li = List(cow1, fish1, bird1)
 
   li.foreach {
     case b: Bird => println(b)
-    case c: Cow => println(c)
+    case c: Cow[_] => println(c)
     case f: Fish => println(f)
-    case a: Animal[Food] => println(a)
     case _ => println("any")
   }
 
@@ -58,8 +56,8 @@ class World {
 
   // For optimization reason Int does not extend Long
   // So, Lower Bound result of Int :: List[Long] in Covar List is List[Anyval]
-  val liInt = List[Int](1,2,3)
-  val liLong = List[Long](1L,2L,3L)
+  val liInt = List[Int](1, 2, 3)
+  val liLong = List[Long](1L, 2L, 3L)
 
   // result is List[List[Anyval]]
   val liCol = List(liInt, liLong)
@@ -67,23 +65,34 @@ class World {
   // result is List[Anyval] for both:
   val liLo = 1 :: liLong
   val liIn = 1L :: liInt
+
+  val liGrass = List[Grass](grass1, grass2)
+  val liGrain = List[Grain](grain1, grain2)
+
+  val liFood = List(liGrass, liGrain)
+  val liFood2 = new FineGrass() :: liGrass
+  val liFood3 = new Grain() :: liGrass
+
+  val a1 = List(new Cow[Grass], new Cow[FineGrass], new Bird)
+
+  Factory.proc(cow1)
+  Factory.proc(fineCow1)
+
+  val ff: Grass => Cow[Grass] = (g: Grass) => cow1.eat(g)
 }
 
-class Animal[-A <: Food] {
-  def eat(food: A): Animal[A] = {
-    println(s"Just ate $food")
-    this
+trait Animal[A <: Animal[A, F], F <: Food] {
+  def eat(food: F): A = {
+    println(s"Just ate: $food")
+    this.asInstanceOf[A]
   }
 }
 
-class Bird extends Animal[Grain]
+class Bird extends Animal[Bird, Grain]
 
-class Cow extends Animal[Grass]
+class Cow[F <: Grass] extends Animal[Cow[F], F]
 
-class FineCow extends Animal[FineGrass]
-
-class Fish extends Animal[CanSwim] with CanSwim
-
+class Fish extends Animal[Fish, CanSwim] with CanSwim
 
 trait Food
 
@@ -95,3 +104,8 @@ class FineGrass extends Grass
 
 trait CanSwim extends Food
 
+object Factory {
+  def proc(cow: Cow[_]): Unit = {
+    println(s"proc $cow")
+  }
+}
